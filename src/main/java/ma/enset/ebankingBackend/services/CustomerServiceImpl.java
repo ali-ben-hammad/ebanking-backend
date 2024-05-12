@@ -51,6 +51,8 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
     public CustomerDTO updateCustomer(CustomerDTO customerDTO) throws CustomerNotFoundException {
        Customer customer = customerRepository.findById(customerDTO.getId()).orElseThrow(()->new CustomerNotFoundException("Customer not found"));
+       customer.setName(customerDTO.getName());
+       customer.setEmail(customerDTO.getEmail());
        Customer updatedCustomer = customerRepository.save(customer);
        log.info("Customer updated with id: "+updatedCustomer.getId());
        return bankAccountMapper.fromCustomer(updatedCustomer);
@@ -62,11 +64,8 @@ public class CustomerServiceImpl implements CustomerService{
         Customer customer = customerRepository.findById(id).orElseThrow(()->new CustomerNotFoundException("Customer not found"));
         // delete associated accounts
         List<BankAccount> bankAccounts = accountRepository.findByCustomerId(id);
-        bankAccounts.forEach(accountRepository::delete);
+        accountRepository.deleteAll(bankAccounts);
 
-        for (BankAccount bankAccount : bankAccounts) {
-            accountRepository.delete(bankAccount);
-        }
 
 
         log.info("Customer deleted with id: "+customer.getId());

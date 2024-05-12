@@ -34,9 +34,9 @@ public class CustomerRestController {
 
     @PutMapping("/customers/{id}")
     public CustomerDTO updateCustomer(
-            @PathVariable Long customerId,
+            @PathVariable Long id,
             @RequestBody CustomerDTO customerDTO) throws CustomerNotFoundException {
-        customerDTO.setId(customerId);
+        customerDTO.setId(id);
         return customerService.updateCustomer(customerDTO);
     }
 
