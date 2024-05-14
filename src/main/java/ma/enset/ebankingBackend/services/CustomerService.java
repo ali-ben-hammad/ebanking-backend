@@ -9,7 +9,7 @@ import java.util.List;
 public interface CustomerService {
 
 
-    List<CustomerDTO> getCustomers();
+    List<CustomerDTO> getCustomers(String keyword);
 
     public CustomerDTO createCustomer(CustomerDTO customerDTO);
 

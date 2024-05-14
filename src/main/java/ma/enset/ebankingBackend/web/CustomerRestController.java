@@ -12,14 +12,16 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin("*")
 public class CustomerRestController {
 
     CustomerService customerService;
 
 
-    @GetMapping("/customers")
-    public List<CustomerDTO> getCustomers() {
-        return customerService.getCustomers();
+    @GetMapping("/customers/search")
+    public List<CustomerDTO> getCustomers(@RequestParam(name = "keyword", required = false) String keyword) {
+        System.out.println(customerService.getCustomers(keyword));
+        return customerService.getCustomers(keyword);
     }
 
     @PostMapping("/customers/create")
@@ -33,9 +35,7 @@ public class CustomerRestController {
     }
 
     @PutMapping("/customers/{id}")
-    public CustomerDTO updateCustomer(
-            @PathVariable Long id,
-            @RequestBody CustomerDTO customerDTO) throws CustomerNotFoundException {
+    public CustomerDTO updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) throws CustomerNotFoundException {
         customerDTO.setId(id);
         return customerService.updateCustomer(customerDTO);
     }

@@ -27,8 +27,8 @@ public class CustomerServiceImpl implements CustomerService{
 
 
     @Override
-    public List<CustomerDTO> getCustomers(){
-        List<Customer> customers = customerRepository.findAll();
+    public List<CustomerDTO> getCustomers(String keyword){
+        List<Customer> customers = customerRepository.findByNameContains(keyword);
             List<CustomerDTO> customerDTOS = customers.stream().map(bankAccountMapper::fromCustomer).toList();
             return customerDTOS;
     }

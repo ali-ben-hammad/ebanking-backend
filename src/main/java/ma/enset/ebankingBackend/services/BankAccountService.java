@@ -4,8 +4,7 @@ import ma.enset.ebankingBackend.Exceptions.AccountNotFoundException;
 import ma.enset.ebankingBackend.Exceptions.BalanceNotSufficientException;
 import ma.enset.ebankingBackend.Exceptions.CustomerNotFoundException;
 import ma.enset.ebankingBackend.dtos.*;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface BankAccountService {
 
@@ -21,9 +20,11 @@ public interface BankAccountService {
     void transfer(String accountIdSource, String accountIdDestination, double amount) throws AccountNotFoundException, BalanceNotSufficientException;
 
 
-    List<BankAccountDTO> bankAccountList();
 
-    List<AccountOperationDTO> accountHistory(String accountId);
+
+    Page<BankAccountDTO> bankAccountList(int page, int size);
+
+    Page<AccountOperationDTO> accountHistory(String accountId, int page , int size);
 
     AccountHistoryDTO getAccountHistory(String accountId, int page, int size) throws AccountNotFoundException;
 }

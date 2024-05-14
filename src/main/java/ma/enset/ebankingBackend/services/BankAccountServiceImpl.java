@@ -14,6 +14,7 @@ import ma.enset.ebankingBackend.repositories.AccountRepository;
 import ma.enset.ebankingBackend.repositories.CustomerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +60,15 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public BankAccountDTO getBankAccount(String id) throws AccountNotFoundException {
-        return null;
+
+        BankAccount bankAccount = bankAccountRepository.findById(id).orElseThrow(()->new AccountNotFoundException("BankAccount not found"));
+        if(bankAccount instanceof SavingAccount){
+            SavingAccount savingAccount = (SavingAccount) bankAccount;
+            return dtoMapper.fromSavingAccount(savingAccount);
+        }else{
+            CurrentAccount currentAccount = (CurrentAccount) bankAccount;
+            return dtoMapper.fromCurrentAccount(currentAccount);
+        }
     }
 
 
@@ -103,9 +112,10 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public List<BankAccountDTO> bankAccountList(){
-        List<BankAccount> bankAccounts = bankAccountRepository.findAll();
-        List<BankAccountDTO> bankAccountDTOS = bankAccounts.stream().map(bankAccount -> {
+    public Page<BankAccountDTO> bankAccountList(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BankAccount> bankAccounts = bankAccountRepository.findAll(pageable);
+        Page<BankAccountDTO> bankAccountDTOS = bankAccounts.map(bankAccount -> {
             if (bankAccount instanceof SavingAccount) {
                 SavingAccount savingAccount = (SavingAccount) bankAccount;
                 return dtoMapper.fromSavingAccount(savingAccount);
@@ -113,13 +123,13 @@ public class BankAccountServiceImpl implements BankAccountService {
                 CurrentAccount currentAccount = (CurrentAccount) bankAccount;
                 return dtoMapper.fromCurrentAccount(currentAccount);
             }
-        }).collect(Collectors.toList());
+        });
         return bankAccountDTOS;
     }
     @Override
-    public List<AccountOperationDTO> accountHistory(String accountId){
-        List<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountId(accountId);
-        return accountOperations.stream().map(op->dtoMapper.fromAccountOperation(op)).collect(Collectors.toList());
+    public Page<AccountOperationDTO> accountHistory(String accountId, int page , int size){
+        Page<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountId(accountId,PageRequest.of(page, size));
+        return accountOperations.map(op->dtoMapper.fromAccountOperation(op));
     }
 
     @Override
